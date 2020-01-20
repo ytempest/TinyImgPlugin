@@ -1,0 +1,51 @@
+<idea-plugin>
+    <id>com.ytempest.tinyimgplugin</id>
+    <name>TinyImgPlugin</name>
+    <version>1.0</version>
+    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+
+    <description><![CDATA[
+      Enter short description for your plugin here.<br>
+      <em>most HTML tags may be used</em>
+    ]]></description>
+
+    <change-notes><![CDATA[
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>
+    ]]>
+    </change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.0" />
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+        <!-- 自定义控制台输入 icon="/myToolWindow/chk_normal.png" -->
+        <toolWindow canCloseContents="false" anchor="bottom" id="TinyImg"
+            factoryClass="com.ytempest.tinyimgplugin.TextToolWindow" />
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <action id="com.ytempest.tinyimgplugin.CompressImgAction"
+            class="com.ytempest.tinyimgplugin.CompressImgAction" text="compressImg"
+            description="Compress image by TinyPNG">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
+        </action>
+
+        <group id="menu_tinyimg" text="TinyImg" description="TinyImg description">
+            <add-to-group group-id="MainMenu" anchor="last" />
+            <action id="com.ytempest.tinyimgplugin.KeyAction"
+                class="com.ytempest.tinyimgplugin.KeyAction" text="Edit Key"
+                description="edit your key for TinyPNG" />
+        </group>
+
+    </actions>
+
+</idea-plugin>
