@@ -3,6 +3,7 @@ package com.ytempest.tinyimgplugin;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.ytempest.tinyimgplugin.tiny.TinyHelper;
 
@@ -15,15 +16,19 @@ import org.apache.http.util.TextUtils;
 public class CompressImgAction extends AnAction {
 
 
-
     @Override
-    public void actionPerformed(AnActionEvent e) {
-        OutputWindowHelper.getInstance().register(e.getProject());
+    public void actionPerformed(AnActionEvent event) {
+        try {
+            OutputWindowHelper.getInstance().register(event.getProject());
+        } catch (Exception e) {
+            Messages.showMessageDialog(e.getMessage(), "Error!!!", Messages.getWarningIcon());
+            return;
+        }
 
         String key = KeyHelper.getInstance().getKey();
         if (TextUtils.isEmpty(key)) {
-            KeyHelper.getInstance().showEditDialog(e.getProject());
-            if (TextUtils.isEmpty(KeyHelper.getInstance().getKey())) {
+            key = KeyHelper.getInstance().editKey(event.getProject());
+            if (TextUtils.isEmpty(key)) {
                 return;
             }
         }
@@ -33,12 +38,12 @@ public class CompressImgAction extends AnAction {
         TinyHelper.setKey(key);
 
         // 获取选中的文件集
-        VirtualFile[] fileArray = e.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
+        VirtualFile[] fileArray = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         if (fileArray == null) {
             return;
         }
         for (VirtualFile virtualFile : fileArray) {
-            TinyHelper.compressFile(virtualFile);
+            TinyHelper.getInstance().compressFile(virtualFile);
         }
     }
 }

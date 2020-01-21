@@ -14,6 +14,6 @@ public class KeyAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        KeyHelper.getInstance().showEditDialog(project);
+        KeyHelper.getInstance().editKey(project);
     }
 }

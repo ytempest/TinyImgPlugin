@@ -37,7 +37,7 @@ public class KeyHelper {
         return properties.getValue(API_KEY, "");
     }
 
-    public void showEditDialog(Project project) {
+    public String editKey(Project project) {
         String key = getKey();
         key = Messages.showInputDialog(project, "Input your API_KEY", "TinyImg", Messages.getInformationIcon(),
                 key, new InputValidator() {
@@ -51,9 +51,12 @@ public class KeyHelper {
                         return s.length() > 0;
                     }
                 }, new TextRange(key.length(), key.length()));
+
         if (!TextUtils.isEmpty(key)) {
             PropertiesComponent properties = PropertiesComponent.getInstance();
             properties.setValue(API_KEY, key);
         }
+
+        return getKey();
     }
 }

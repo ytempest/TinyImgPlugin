@@ -4,12 +4,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.tinify.AccountException;
 import com.tinify.ClientException;
 import com.tinify.ConnectionException;
+import com.tinify.Result;
 import com.tinify.ServerException;
+import com.tinify.Source;
 import com.tinify.Tinify;
 
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,6 +22,28 @@ import java.util.concurrent.Executors;
  * @since 2020/1/13
  */
 public class TinyHelper {
+
+    private volatile static TinyHelper sInstance = null;
+
+    public static TinyHelper getInstance() {
+        if (sInstance == null) {
+            synchronized (TinyHelper.class) {
+                if (sInstance == null) {
+                    sInstance = new TinyHelper();
+                }
+            }
+        }
+        return sInstance;
+    }
+
+    private TinyHelper() {
+    }
+
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
 
     public static void setKey(String key) {
         Tinify.setKey(key);
@@ -35,12 +60,14 @@ public class TinyHelper {
      * @param srcFilePath path of image need compress
      * @param tarFilePath output path of image compress success
      */
-    public static void compress(String srcFilePath, String tarFilePath) {
+    public void compress(String srcFilePath, String tarFilePath) {
         try {
             OutUtils.d("upload and compress : " + srcFilePath);
             long beforeSize = new File(srcFilePath).length();
 //            Source source = Tinify.fromFile(srcFilePath);
 //            Result result = source.result();
+
+            Thread.sleep(new Random().nextInt(3000) + 3000);
 
             OutUtils.d("download to : " + srcFilePath);
 //            long afterSize = result.size();
@@ -70,25 +97,27 @@ public class TinyHelper {
     }
 
     /*compress*/
+    public void compressFile(VirtualFile input) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<VirtualFile> files = null;
+                if (input.isDirectory()) {
+                    files = FileUtils.listImageFile(input, false);
 
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
+                } else if (FileUtils.isImageFile(input)) {
+                    files = new LinkedList<>();
+                    files.add(input);
+                }
 
-    public static void compressFile(VirtualFile input) {
-        List<VirtualFile> files = null;
-        if (input.isDirectory()) {
-            files = FileUtils.listImageFile(input, false);
-
-        } else if (FileUtils.isImageFile(input)) {
-            files = new LinkedList<>();
-            files.add(input);
-        }
-
-        if (Utils.getSize(files) > 0) {
-            compress(files);
-        }
+                if (Utils.getSize(files) > 0) {
+                    compress(files);
+                }
+            }
+        });
     }
 
-    private static void compress(List<VirtualFile> inFiles) {
+    private void compress(List<VirtualFile> inFiles) {
         OutUtils.d("===============start compress===============");
         OutUtils.d("Use key : " + Tinify.key());
 
@@ -97,7 +126,7 @@ public class TinyHelper {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    TinyHelper.compress(inFile.getPath(), inFile.getPath());
+                    compress(inFile.getPath(), inFile.getPath());
                     latch.countDown();
                 }
             });
