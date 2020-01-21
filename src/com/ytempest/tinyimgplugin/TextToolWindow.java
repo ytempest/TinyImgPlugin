@@ -1,6 +1,8 @@
 package com.ytempest.tinyimgplugin;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectCoreUtil;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -23,15 +25,17 @@ import javax.swing.JTextArea;
  */
 public class TextToolWindow implements ToolWindowFactory {
 
-    private ToolWindow mToolWindow;
     private JPanel mRootPanel;
     private JScrollPane mScrollPane;
     private JTextArea mTextArea;
 
     @Override
     public void init(ToolWindow window) {
-        mToolWindow = window;
-        System.out.println("init ToolWindow : " + mToolWindow);
+        System.out.println("init ToolWindow : " + window);
+        Project theProject = ProjectCoreUtil.theProject;
+        System.out.println("init theProject : " + theProject);
+        boolean enable = ConfigHelper.getInstance().isWindowEnable();
+        window.setAvailable(enable, null);
     }
 
     @Override

@@ -29,6 +29,8 @@
         <!-- 自定义控制台输入 icon="/myToolWindow/chk_normal.png" -->
         <toolWindow canCloseContents="false" anchor="bottom" id="TinyImg"
             factoryClass="com.ytempest.tinyimgplugin.TextToolWindow" />
+        <applicationService serviceInterface="com.ytempest.tinyimgplugin.servie"
+            serviceImplementation="com.ytempest.tinyimgplugin.impl.servieImpl" />
     </extensions>
 
     <actions>
@@ -39,13 +41,17 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
         </action>
 
-        <group id="menu_tinyimg" text="TinyImg" description="TinyImg description">
-            <add-to-group group-id="MainMenu" anchor="last" />
-            <action id="com.ytempest.tinyimgplugin.KeyAction"
-                class="com.ytempest.tinyimgplugin.KeyAction" text="Edit Key"
-                description="edit your key for TinyPNG" />
-        </group>
+        <!--<group id="menu_tinyimg" text="TinyImg" description="TinyImg description">-->
+        <!--<add-to-group group-id="MainMenu" anchor="last" />-->
+        <!--<action id="com.ytempest.tinyimgplugin.KeyAction"-->
+        <!--class="com.ytempest.tinyimgplugin.KeyAction" text="Edit Key"-->
+        <!--description="edit your key for TinyPNG" />-->
+        <!--</group>-->
 
+        <group id="menu_tinyimg" text="TinyImg" description="TinyImg description" popup="true"
+            class="com.ytempest.tinyimgplugin.group.TinyImgGroup">
+            <add-to-group group-id="ToolsMenu" anchor="last" />
+        </group>
     </actions>
 
 </idea-plugin>

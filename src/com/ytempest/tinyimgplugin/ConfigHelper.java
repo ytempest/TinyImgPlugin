@@ -12,24 +12,24 @@ import org.apache.http.util.TextUtils;
  * @author heqidu
  * @since 2020/1/20
  */
-public class KeyHelper {
-    private volatile static KeyHelper sInstance = null;
+public class ConfigHelper {
+    private volatile static ConfigHelper sInstance = null;
 
-    public static KeyHelper getInstance() {
+    public static ConfigHelper getInstance() {
         if (sInstance == null) {
-            synchronized (KeyHelper.class) {
+            synchronized (ConfigHelper.class) {
                 if (sInstance == null) {
-                    sInstance = new KeyHelper();
+                    sInstance = new ConfigHelper();
                 }
             }
         }
         return sInstance;
     }
 
-    private KeyHelper() {
+    private ConfigHelper() {
     }
 
-    private static final String API_KEY = "API_KEY";
+    private static final String API_KEY = "api_key";
 
     public String getKey() {
         //获取 application 级别的 PropertiesComponent
@@ -58,5 +58,17 @@ public class KeyHelper {
         }
 
         return getKey();
+    }
+
+    private static final String WINDOW_STATUS = "window_status";
+
+    public void setWindowEnable(boolean enable) {
+        PropertiesComponent properties = PropertiesComponent.getInstance();
+        properties.setValue(WINDOW_STATUS, String.valueOf(enable));
+    }
+
+    public boolean isWindowEnable() {
+        PropertiesComponent properties = PropertiesComponent.getInstance();
+        return Boolean.valueOf(properties.getValue(WINDOW_STATUS, "true"));
     }
 }

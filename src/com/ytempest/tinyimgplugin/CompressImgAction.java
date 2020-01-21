@@ -25,9 +25,9 @@ public class CompressImgAction extends AnAction {
             return;
         }
 
-        String key = KeyHelper.getInstance().getKey();
+        String key = ConfigHelper.getInstance().getKey();
         if (TextUtils.isEmpty(key)) {
-            key = KeyHelper.getInstance().editKey(event.getProject());
+            key = ConfigHelper.getInstance().editKey(event.getProject());
             if (TextUtils.isEmpty(key)) {
                 return;
             }

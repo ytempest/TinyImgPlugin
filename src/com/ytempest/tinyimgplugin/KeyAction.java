@@ -10,10 +10,17 @@ import com.intellij.openapi.project.Project;
  */
 public class KeyAction extends AnAction {
 
+    public KeyAction() {
+        super("Edit Key", "edit your key for TinyPNG", null);
+    }
+
+    int a = 1;
 
     @Override
     public void actionPerformed(AnActionEvent e) {
         Project project = e.getProject();
-        KeyHelper.getInstance().editKey(project);
+        ConfigHelper.getInstance().editKey(project);
+        System.out.println("a=" + a);
+        getTemplatePresentation().setText("" + (a++));
     }
 }
