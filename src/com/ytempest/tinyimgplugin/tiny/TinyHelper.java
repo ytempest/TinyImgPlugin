@@ -4,9 +4,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.tinify.AccountException;
 import com.tinify.ClientException;
 import com.tinify.ConnectionException;
-import com.tinify.Result;
 import com.tinify.ServerException;
-import com.tinify.Source;
 import com.tinify.Tinify;
 
 import java.io.File;
@@ -46,7 +44,9 @@ public class TinyHelper {
     }
 
     public static void setKey(String key) {
-        Tinify.setKey(key);
+        if (key != null && !key.equals(Tinify.key())) {
+            Tinify.setKey(key);
+        }
     }
 
     /**

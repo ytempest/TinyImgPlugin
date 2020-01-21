@@ -19,7 +19,7 @@ public class CompressImgAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
         try {
-            OutputWindowHelper.getInstance().register(event.getProject());
+            OutputWindowHelper.getInstance().init(event.getProject());
         } catch (Exception e) {
             Messages.showMessageDialog(e.getMessage(), "Error!!!", Messages.getWarningIcon());
             return;

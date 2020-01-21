@@ -38,7 +38,7 @@ public class OutputWindowHelper {
     private ToolWindow toolWindow;
     private JTextArea mOutputArea;
 
-    public void register(Project project) throws Exception {
+    public void init(Project project) throws Exception {
         if (toolWindow != null) {
             return;
         }
