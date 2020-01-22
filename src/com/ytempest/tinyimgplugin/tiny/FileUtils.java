@@ -23,7 +23,8 @@ public class FileUtils {
         if (file != null && file.isDirectory()) {
             VirtualFile[] files = file.getChildren();
 //            VfsUtilCore.visitChildrenRecursively();
-            for (int i = 0, len = Utils.getSize(files); i < len; i++) {
+            int len = files != null ? files.length : 0;
+            for (int i = 0; i < len; i++) {
                 VirtualFile unknown = files[i];
                 if (recursive && unknown.isDirectory()) {
                     list.addAll(listImageFile(unknown, recursive));

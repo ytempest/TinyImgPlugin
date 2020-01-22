@@ -11,8 +11,14 @@ import com.ytempest.tinyimgplugin.TextWindowHelper;
  */
 public class WindowAction extends AnAction {
 
+    private static final String HIDE = "hide window";
+    private static final String SHOW = "show window";
+    private static final String DESCRIPTION = "set the window status";
+
+
     public WindowAction() {
         getTemplatePresentation().setText(getName());
+        getTemplatePresentation().setDescription(DESCRIPTION);
     }
 
     @Override
@@ -30,6 +36,6 @@ public class WindowAction extends AnAction {
 
     private String getName() {
         boolean enable = ConfigHelper.getInstance().isWindowEnable();
-        return enable ? "hide window" : "show window";
+        return enable ? HIDE : SHOW;
     }
 }

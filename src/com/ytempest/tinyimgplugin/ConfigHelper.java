@@ -1,12 +1,6 @@
 package com.ytempest.tinyimgplugin;
 
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.InputValidator;
-import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.TextRange;
-
-import org.apache.http.util.TextUtils;
 
 /**
  * @author heqidu
@@ -37,33 +31,18 @@ public class ConfigHelper {
         return properties.getValue(API_KEY, "");
     }
 
-    public String editKey(Project project) {
-        String key = getKey();
-        key = Messages.showInputDialog(project, "Input your API_KEY", "TinyImg", Messages.getInformationIcon(),
-                key, new InputValidator() {
-                    @Override
-                    public boolean checkInput(String s) {
-                        return s.length() > 0;
-                    }
-
-                    @Override
-                    public boolean canClose(String s) {
-                        return s.length() > 0;
-                    }
-                }, new TextRange(key.length(), key.length()));
-
-        if (!TextUtils.isEmpty(key)) {
-            PropertiesComponent properties = PropertiesComponent.getInstance();
-            properties.setValue(API_KEY, key);
-        }
-
-        return getKey();
+    public void setKey(String key) {
+        PropertiesComponent properties = PropertiesComponent.getInstance();
+        properties.setValue(API_KEY, key);
     }
 
     private static final String WINDOW_STATUS = "window_status";
 
     public void setWindowEnable(boolean enable) {
         PropertiesComponent properties = PropertiesComponent.getInstance();
+        // 这里之所以使用String来保存boolean是由于在第一次存储时，若保存的为false，那么这个值是不会
+        // 持久化的【神奇的代码】，如果在保存了为false，但是获取时默认为true就会导致：明明已经保存了
+        // false，但是获取到的是true
         properties.setValue(WINDOW_STATUS, String.valueOf(enable));
     }
 

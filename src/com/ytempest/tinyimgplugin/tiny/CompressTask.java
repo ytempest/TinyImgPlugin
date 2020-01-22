@@ -5,8 +5,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.tinify.AccountException;
 import com.tinify.ClientException;
 import com.tinify.ConnectionException;
+import com.tinify.Result;
 import com.tinify.ServerException;
+import com.tinify.Source;
 import com.tinify.Tinify;
+import com.ytempest.tinyimgplugin.TextWindowHelper;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -24,7 +27,7 @@ public class CompressTask {
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
-    private Project mProject;
+    private final Project mProject;
 
     public CompressTask(Project project) {
         mProject = project;
@@ -38,34 +41,31 @@ public class CompressTask {
     }
 
     public void exe(VirtualFile input) {
-        compressFile(input);
+        executor.execute(() -> compressFile(input));
     }
 
     /*compress*/
 
-    public void compressFile(VirtualFile input) {
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                List<VirtualFile> files = null;
-                if (input.isDirectory()) {
-                    files = FileUtils.listImageFile(input, false);
+    private void compressFile(VirtualFile input) {
+        List<VirtualFile> files = null;
+        if (input.isDirectory()) {
+            files = FileUtils.listImageFile(input, false);
 
-                } else if (FileUtils.isImageFile(input)) {
-                    files = new LinkedList<>();
-                    files.add(input);
-                }
+        } else if (FileUtils.isImageFile(input)) {
+            files = new LinkedList<>();
+            files.add(input);
+        }
 
-                if (Utils.getSize(files) > 0) {
-                    compress(files);
-                }
-            }
-        });
+        compress(files);
     }
 
     private void compress(List<VirtualFile> inFiles) {
-        OutUtils.d(mProject, "===============start compress===============");
-        OutUtils.d(mProject, "Use key : " + Tinify.key());
+        if (inFiles != null && inFiles.size() > 0) {
+            return;
+        }
+
+        print("===============start compress===============");
+        print("Use key : " + Tinify.key());
 
         final CountDownLatch latch = new CountDownLatch(inFiles.size());
         for (final VirtualFile inFile : inFiles) {
@@ -81,10 +81,10 @@ public class CompressTask {
         try {
             latch.await();
 
-            OutUtils.d(mProject, "Already used count : " + Tinify.compressionCount());
-            OutUtils.d(mProject, "===============finish compress===============");
+            print("Already used count : " + Tinify.compressionCount());
+            print("===============finish compress===============");
         } catch (Exception e) {
-            OutUtils.e(mProject, "unknown error : " + e.getMessage());
+            print("unknown error : " + e.getMessage());
         }
     }
 
@@ -100,40 +100,44 @@ public class CompressTask {
      * @param srcFilePath path of image need compress
      * @param tarFilePath output path of image compress success
      */
-    public void compress(String srcFilePath, String tarFilePath) {
+    private void compress(String srcFilePath, String tarFilePath) {
         try {
-            OutUtils.d(mProject, "upload and compress : " + srcFilePath);
+            print("upload and compress : " + srcFilePath);
             long beforeSize = new File(srcFilePath).length();
-//            Source source = Tinify.fromFile(srcFilePath);
-//            Result result = source.result();
+            Source source = Tinify.fromFile(srcFilePath);
+            Result result = source.result();
 
             Thread.sleep(new Random().nextInt(3000) + 3000);
 
-            OutUtils.d(mProject, "download to : " + srcFilePath);
-//            long afterSize = result.size();
-//            result.toFile(tarFilePath);
+            print("download to : " + srcFilePath);
+            long afterSize = result.size();
+            result.toFile(tarFilePath);
 
-            OutUtils.d(mProject, String.format("finish compress : %s, size: %skb -> %skb", srcFilePath, beforeSize, 11));
+            print(String.format("finish compress : %s, size: %skb -> %skb", srcFilePath, beforeSize, afterSize));
         } catch (Exception e) {
-            OutUtils.e(mProject, "Fail to compress : " + srcFilePath);
-            OutUtils.e(mProject, "The error message is: " + e.getMessage());
+            print("Fail to compress : " + srcFilePath);
+            print("The error message is: " + e.getMessage());
 
             if (e instanceof AccountException) {
-                OutUtils.e(mProject, "Please verify your API key and account limit");
+                print("Please verify your API key and account limit");
 
             } else if (e instanceof ClientException) {
-                OutUtils.e(mProject, "Please check your source image and request options");
+                print("Please check your source image and request options");
 
             } else if (e instanceof ServerException) {
-                OutUtils.e(mProject, "Temporary issue with the Tinify API");
+                print("Temporary issue with the Tinify API");
 
             } else if (e instanceof ConnectionException) {
-                OutUtils.e(mProject, "A network connection error occurred, please try again");
+                print("A network connection error occurred, please try again");
 
             } else {
-                OutUtils.e(mProject, "Something else went wrong, unrelated to the Tinify API");
+                print("Something else went wrong, unrelated to the Tinify API");
             }
         }
     }
 
+    private void print(String msg) {
+        System.out.println(msg);
+        TextWindowHelper.getInstance().print(msg, mProject);
+    }
 }
