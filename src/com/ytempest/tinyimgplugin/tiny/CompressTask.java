@@ -108,7 +108,6 @@ public class CompressTask {
             long beforeSize = new File(srcFilePath).length();
             Source source = Tinify.fromFile(srcFilePath);
             Result result = source.result();
-            Thread.sleep(7000);
 
             print("download to : " + relativePath);
             long afterSize = result.size();
@@ -138,7 +137,7 @@ public class CompressTask {
     }
 
     private void print(String msg) {
-//        System.out.println(msg);
+        System.out.println(msg);
         TextWindowHelper.getInstance().print(msg, mProject);
     }
 }

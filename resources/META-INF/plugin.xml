@@ -2,16 +2,18 @@
     <id>com.ytempest.tinyimgplugin</id>
     <name>TinyImgPlugin</name>
     <version>1.0</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor url="https://github.com/ytempest" email="787491096@qq.com">ytempest</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Use the TinyPNG to compress image<br>
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+        <b>1.0</b>
+        <ul>
+            <li>Support edit API_KEY orf TinyPNG</li>
+            <li>Support target a image or directory</li>
+        </ul>
     ]]>
     </change-notes>
 
