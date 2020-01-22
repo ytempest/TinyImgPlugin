@@ -14,7 +14,6 @@ import com.ytempest.tinyimgplugin.TextWindowHelper;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,9 +27,11 @@ public class CompressTask {
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
     private final Project mProject;
+    private final String mProjectPath;
 
     public CompressTask(Project project) {
         mProject = project;
+        mProjectPath = project.getBasePath();
     }
 
     public CompressTask key(String key) {
@@ -60,7 +61,7 @@ public class CompressTask {
     }
 
     private void compress(List<VirtualFile> inFiles) {
-        if (inFiles != null && inFiles.size() > 0) {
+        if (inFiles == null || inFiles.size() == 0) {
             return;
         }
 
@@ -101,21 +102,21 @@ public class CompressTask {
      * @param tarFilePath output path of image compress success
      */
     private void compress(String srcFilePath, String tarFilePath) {
+        String relativePath = srcFilePath.replace(mProjectPath + "/", "");
         try {
-            print("upload and compress : " + srcFilePath);
+            print("upload and compress : " + relativePath);
             long beforeSize = new File(srcFilePath).length();
             Source source = Tinify.fromFile(srcFilePath);
             Result result = source.result();
+            Thread.sleep(7000);
 
-            Thread.sleep(new Random().nextInt(3000) + 3000);
-
-            print("download to : " + srcFilePath);
+            print("download to : " + relativePath);
             long afterSize = result.size();
             result.toFile(tarFilePath);
 
-            print(String.format("finish compress : %s, size: %skb -> %skb", srcFilePath, beforeSize, afterSize));
+            print(String.format("finish compress : %s, size: %skb -> %skb", relativePath, beforeSize, afterSize));
         } catch (Exception e) {
-            print("Fail to compress : " + srcFilePath);
+            print("Fail to compress : " + relativePath);
             print("The error message is: " + e.getMessage());
 
             if (e instanceof AccountException) {
@@ -137,7 +138,7 @@ public class CompressTask {
     }
 
     private void print(String msg) {
-        System.out.println(msg);
+//        System.out.println(msg);
         TextWindowHelper.getInstance().print(msg, mProject);
     }
 }

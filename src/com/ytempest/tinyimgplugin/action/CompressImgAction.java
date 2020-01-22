@@ -22,6 +22,10 @@ public class CompressImgAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent event) {
         Project project = event.getProject();
+        if (project == null) {
+            Messages.showMessageDialog("Can not identify project", "Tip", Messages.getWarningIcon());
+            return;
+        }
 
         String key = ConfigHelper.getInstance().getKey();
         if (TextUtils.isEmpty(key)) {

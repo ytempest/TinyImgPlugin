@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.tools.ToolManager;
 import com.intellij.ui.content.Content;
 
 import org.jetbrains.annotations.NotNull;
@@ -71,20 +70,13 @@ public class TextWindowHelper {
             @Override
             public void run() {
                 outputPanel.append(msg + "\n");
-
             }
         });
-
-//        synchronized (outputPanel) {
-//
-//        }
     }
 
     @Nullable
     public ToolWindow getToolWindow(Project project) {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(WINDOW_NAME);
-//        Messages.showMessageDialog("project=" + project + " | toolwindow=" + toolWindow, "title", Messages.getInformationIcon());
-        return toolWindow;
+        return ToolWindowManager.getInstance(project).getToolWindow(WINDOW_NAME);
     }
 
     @Nullable
@@ -92,9 +84,9 @@ public class TextWindowHelper {
         JTextArea outputPanel = null;
         try {
             // ToolWindow未初始化时
-            Content tinyimgContent = toolWindow.getContentManager().getContent(0);
-            if (tinyimgContent != null) {
-                JPanel mainPanel = (JPanel) tinyimgContent.getComponent().getComponent(0);
+            Content rootContent = toolWindow.getContentManager().getContent(0);
+            if (rootContent != null) {
+                JPanel mainPanel = (JPanel) rootContent.getComponent().getComponent(0);
                 JScrollPane scrollPane = (JScrollPane) mainPanel.getComponent(0);
                 outputPanel = (JTextArea) scrollPane.getViewport().getComponent(0);
             }
