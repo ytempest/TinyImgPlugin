@@ -26,7 +26,7 @@ public class ConfigHelper {
     private static final String API_KEY = "api_key";
 
     public String getKey() {
-        //获取 application 级别的 PropertiesComponent
+        //获取 application 级别的 PropertiesComponent，用于持久化数据
         PropertiesComponent properties = PropertiesComponent.getInstance();
         return properties.getValue(API_KEY, "");
     }

@@ -28,10 +28,16 @@ public class WindowAction extends AnAction {
         anActionEvent.getPresentation().setText(getName());
     }
 
+    /**
+     * 如果想动态修改Action的名称，必须通过该方法，并使用{@link AnActionEvent#getPresentation()}的
+     * setText()方法来设置，否则不会生效
+     * <p>
+     * 注意：{@link AnAction#getTemplatePresentation()}的setText()方法只在构建时会生效
+     */
     @Override
-    public void update(AnActionEvent e) {
-        super.update(e);
-        e.getPresentation().setText(getName());
+    public void update(AnActionEvent event) {
+        super.update(event);
+        event.getPresentation().setText(getName());
     }
 
     private String getName() {
