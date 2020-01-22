@@ -83,7 +83,7 @@ public class CompressTask {
             latch.await();
 
             print("Already used count : " + Tinify.compressionCount());
-            print("===============finish compress===============");
+            print("===============finish compress===============\n");
         } catch (Exception e) {
             print("unknown error : " + e.getMessage());
         }
