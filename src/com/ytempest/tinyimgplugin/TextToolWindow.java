@@ -1,15 +1,7 @@
 package com.ytempest.tinyimgplugin;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectCoreUtil;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
 import com.intellij.util.ui.JBUI;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
@@ -23,27 +15,24 @@ import javax.swing.JTextArea;
  * @author heqidu
  * @since 2020/1/19
  */
-public class TextToolWindow implements ToolWindowFactory {
+public class TextToolWindow {
 
+    private ToolWindow mToolWindow;
     private JPanel mRootPanel;
     private JScrollPane mScrollPane;
     private JTextArea mTextArea;
 
-    @Override
-    public void init(ToolWindow window) {
-        System.out.println("init ToolWindow : " + window);
-        Project theProject = ProjectCoreUtil.theProject;
-        System.out.println("init theProject : " + theProject);
+    public TextToolWindow(ToolWindow toolWindow) {
+        mToolWindow = toolWindow;
+
         boolean enable = ConfigHelper.getInstance().isWindowEnable();
-        window.setAvailable(enable, null);
+        mToolWindow.setAvailable(enable, null);
+
+        init();
     }
 
-    @Override
-    public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        ContentFactory factory = ContentFactory.SERVICE.getInstance();
-        Content content = factory.createContent(mRootPanel, "", false);
-        toolWindow.getContentManager().addContent(content);
-        init();
+    public JPanel getContent() {
+        return mRootPanel;
     }
 
     private void init() {

@@ -1,7 +1,9 @@
-package com.ytempest.tinyimgplugin;
+package com.ytempest.tinyimgplugin.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.ytempest.tinyimgplugin.ConfigHelper;
+import com.ytempest.tinyimgplugin.TextWindowHelper;
 
 /**
  * @author heqidu
@@ -16,10 +18,8 @@ public class WindowAction extends AnAction {
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
         boolean enable = !ConfigHelper.getInstance().isWindowEnable();
-        OutputWindowHelper.getInstance().setWindowEnable(anActionEvent.getProject(), enable);
-        ConfigHelper.getInstance().setWindowEnable(enable);
+        TextWindowHelper.getInstance().setWindowEnable(enable);
         anActionEvent.getPresentation().setText(getName());
-        System.out.println("anActionEvent=" + anActionEvent.getProject());
     }
 
     @Override

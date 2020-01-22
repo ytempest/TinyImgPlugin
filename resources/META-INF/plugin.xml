@@ -28,28 +28,26 @@
         <!-- Add your extensions here -->
         <!-- 自定义控制台输入 icon="/myToolWindow/chk_normal.png" -->
         <toolWindow canCloseContents="false" anchor="bottom" id="TinyImg"
-            factoryClass="com.ytempest.tinyimgplugin.TextToolWindow" />
-        <applicationService serviceInterface="com.ytempest.tinyimgplugin.servie"
-            serviceImplementation="com.ytempest.tinyimgplugin.impl.servieImpl" />
+            factoryClass="com.ytempest.tinyimgplugin.TextToolWindowFactory" />
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
-        <action id="com.ytempest.tinyimgplugin.CompressImgAction"
-            class="com.ytempest.tinyimgplugin.CompressImgAction" text="compressImg"
+        <action id="com.ytempest.tinyimgplugin.action.CompressImgAction"
+            class="com.ytempest.tinyimgplugin.action.CompressImgAction" text="compressImg"
             description="Compress image by TinyPNG">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
         </action>
 
         <!--<group id="menu_tinyimg" text="TinyImg" description="TinyImg description">-->
         <!--<add-to-group group-id="MainMenu" anchor="last" />-->
-        <!--<action id="com.ytempest.tinyimgplugin.KeyAction"-->
-        <!--class="com.ytempest.tinyimgplugin.KeyAction" text="Edit Key"-->
+        <!--<action id="com.ytempest.tinyimgplugin.action.KeyAction"-->
+        <!--class="com.ytempest.tinyimgplugin.action.KeyAction" text="Edit Key"-->
         <!--description="edit your key for TinyPNG" />-->
         <!--</group>-->
 
         <group id="menu_tinyimg" text="TinyImg" description="TinyImg description" popup="true"
-            class="com.ytempest.tinyimgplugin.group.TinyImgGroup">
+            class="com.ytempest.tinyimgplugin.action.TinyImgGroup">
             <add-to-group group-id="ToolsMenu" anchor="last" />
         </group>
     </actions>

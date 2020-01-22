@@ -1,7 +1,5 @@
 package com.ytempest.tinyimgplugin.tiny;
 
-import com.sun.istack.internal.Nullable;
-
 import java.util.Collection;
 
 /**
@@ -16,17 +14,5 @@ public class Utils {
 
     public static int getSize(Collection collections) {
         return collections != null ? collections.size() : 0;
-    }
-
-    @Nullable
-    public static String get(String[] strings, int index) {
-        if (strings != null && strings.length > index) {
-            return strings[index];
-        }
-        return null;
-    }
-
-    public static boolean isEmpty(String string) {
-        return string == null || string.length() == 0;
     }
 }

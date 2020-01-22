@@ -1,8 +1,9 @@
-package com.ytempest.tinyimgplugin;
+package com.ytempest.tinyimgplugin.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.ytempest.tinyimgplugin.ConfigHelper;
 
 /**
  * @author heqidu
