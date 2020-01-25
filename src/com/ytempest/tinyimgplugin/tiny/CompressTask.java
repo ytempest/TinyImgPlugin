@@ -41,24 +41,26 @@ public class CompressTask {
         return this;
     }
 
-    public void exe(VirtualFile input) {
-        executor.execute(() -> compressFile(input));
+    public void exe(VirtualFile... files) {
+        if (files == null || files.length == 0) {
+            return;
+        }
+        executor.execute(() -> {
+            List<VirtualFile> srcFileList = new LinkedList<>();
+            for (VirtualFile virtualFile : files) {
+                if (virtualFile.isDirectory()) {
+                    List<VirtualFile> imageList = FileUtils.listImageFile(virtualFile, false);
+                    srcFileList.addAll(imageList);
+
+                } else if (FileUtils.isImageFile(virtualFile)) {
+                    srcFileList.add(virtualFile);
+                }
+            }
+            compress(srcFileList);
+        });
     }
 
     /*compress*/
-
-    private void compressFile(VirtualFile input) {
-        List<VirtualFile> files = null;
-        if (input.isDirectory()) {
-            files = FileUtils.listImageFile(input, false);
-
-        } else if (FileUtils.isImageFile(input)) {
-            files = new LinkedList<>();
-            files.add(input);
-        }
-
-        compress(files);
-    }
 
     private void compress(List<VirtualFile> inFiles) {
         if (inFiles == null || inFiles.size() == 0) {
@@ -70,12 +72,9 @@ public class CompressTask {
 
         final CountDownLatch latch = new CountDownLatch(inFiles.size());
         for (final VirtualFile inFile : inFiles) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    compress(inFile.getPath(), inFile.getPath());
-                    latch.countDown();
-                }
+            executor.execute(() -> {
+                compress(inFile.getPath(), inFile.getPath());
+                latch.countDown();
             });
         }
 

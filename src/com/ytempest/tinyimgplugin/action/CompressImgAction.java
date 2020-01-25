@@ -39,17 +39,17 @@ public class CompressImgAction extends AnAction {
             }
         }
 
-        TextWindowHelper.getInstance().show(project);
-
         // 获取选中的文件集
         VirtualFile[] fileArray = event.getData(PlatformDataKeys.VIRTUAL_FILE_ARRAY);
         if (fileArray == null) {
             return;
         }
-        for (VirtualFile virtualFile : fileArray) {
-            new CompressTask(project)
-                    .key(key)
-                    .exe(virtualFile);
-        }
+
+        // 展示输出框
+        TextWindowHelper.getInstance().show(project);
+        // 启动压缩任务
+        new CompressTask(project)
+                .key(key)
+                .exe(fileArray);
     }
 }
