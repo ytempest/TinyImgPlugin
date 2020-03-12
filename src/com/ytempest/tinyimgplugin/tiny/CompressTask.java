@@ -11,6 +11,8 @@ import com.tinify.Source;
 import com.tinify.Tinify;
 import com.ytempest.tinyimgplugin.TextWindowHelper;
 
+import org.jetbrains.annotations.SystemIndependent;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +33,8 @@ public class CompressTask {
 
     public CompressTask(Project project) {
         mProject = project;
-        mProjectPath = project.getBasePath();
+        @SystemIndependent String basePath = project.getBasePath();
+        mProjectPath = basePath != null ? basePath.replace("/", File.separator) : "";
     }
 
     public CompressTask key(String key) {
@@ -69,13 +72,26 @@ public class CompressTask {
         print("Use key : " + Tinify.key());
 
         final CountDownLatch latch = new CountDownLatch(inFiles.size());
-        for (final VirtualFile inFile : inFiles) {
-            executor.execute(new Runnable() {
-                @Override
-                public void run() {
-                    compress(inFile.getPath(), inFile.getPath());
-                    latch.countDown();
+        for (final VirtualFile srcVirtualFile : inFiles) {
+            executor.execute(() -> {
+                // 操作临时文件
+                File srcFile = new File(srcVirtualFile.getPath());
+                File tmpFile = new File(srcVirtualFile.getParent().getPath(), srcVirtualFile.getName() + ".tmp");
+                boolean compressResult = compress(srcFile.getPath(), tmpFile.getPath());
+
+                // 压缩成功后删除重命名临时文件为原文件
+                if (compressResult) {
+                    long beforeSize = srcFile.length();
+                    boolean success = srcFile.delete() && tmpFile.renameTo(srcFile);
+                    long afterSize = srcFile.length();
+
+                    if (!success) {
+                        print("Fail to process the file : " + tmpFile.getAbsolutePath());
+                    } else {
+                        print(String.format("finish compress : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
+                    }
                 }
+                latch.countDown();
             });
         }
 
@@ -99,24 +115,21 @@ public class CompressTask {
      * About Tinify : <a href>https://tinypng.com/</a>
      *
      * @param srcFilePath path of image need compress
-     * @param tarFilePath output path of image compress success
+     * @param destFilePath output path of image compress success
      */
-    private void compress(String srcFilePath, String tarFilePath) {
-        String relativePath = srcFilePath.replace(mProjectPath + "/", "");
+    private boolean compress(String srcFilePath, String destFilePath) {
+        String relativePath = getRelativePath(srcFilePath);
         try {
-            print("upload and compress : " + relativePath);
-            long beforeSize = new File(srcFilePath).length();
+            print("compress : " + relativePath);
             Source source = Tinify.fromFile(srcFilePath);
             Result result = source.result();
 
-            print("download to : " + relativePath);
-            long afterSize = result.size();
-            result.toFile(tarFilePath);
+            print("download : " + relativePath);
+            result.toFile(destFilePath);
 
-            print(String.format("finish compress : %s, size: %skb -> %skb", relativePath, beforeSize, afterSize));
+            return true;
         } catch (Exception e) {
             print("Fail to compress : " + relativePath);
-            print("The error message is: " + e.getMessage());
 
             if (e instanceof AccountException) {
                 print("Please verify your API key and account limit");
@@ -131,9 +144,17 @@ public class CompressTask {
                 print("A network connection error occurred, please try again");
 
             } else {
-                print("Something else went wrong, unrelated to the Tinify API");
+                print("The error message is: " + e.getMessage());
             }
         }
+        return false;
+    }
+
+    /**
+     * 获取指定文件在当前项目的路劲
+     */
+    private String getRelativePath(String path) {
+        return path.replace(mProjectPath + File.separator, "");
     }
 
     private void print(String msg) {
