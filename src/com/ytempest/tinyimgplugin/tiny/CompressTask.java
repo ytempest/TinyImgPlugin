@@ -14,6 +14,7 @@ import com.ytempest.tinyimgplugin.TextWindowHelper;
 import org.jetbrains.annotations.SystemIndependent;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -65,6 +66,8 @@ public class CompressTask {
 
     /*compress*/
 
+    private final List<String> failList = new ArrayList<>();
+
     private void compress(List<VirtualFile> inFiles) {
         if (inFiles == null || inFiles.size() == 0) {
             return;
@@ -79,19 +82,23 @@ public class CompressTask {
                 // 操作临时文件
                 File srcFile = new File(srcVirtualFile.getPath());
                 File tmpFile = new File(srcVirtualFile.getParent().getPath(), srcVirtualFile.getName() + ".tmp");
-                boolean compressResult = compress(srcFile.getPath(), tmpFile.getPath());
+                try {
+                    print("compress : " + getRelativePath(srcFile.getPath()));
+                    compress(srcFile.getPath(), tmpFile.getPath());
 
-                // 压缩成功后删除重命名临时文件为原文件
-                if (compressResult) {
+                    // 压缩成功后删除重命名临时文件为原文件
                     long beforeSize = srcFile.length();
                     boolean success = srcFile.delete() && tmpFile.renameTo(srcFile);
                     long afterSize = srcFile.length();
 
-                    if (!success) {
-                        print("Fail to process the file : " + tmpFile.getAbsolutePath());
-                    } else {
+                    if (success) {
                         print(String.format("finish compress : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
+                    } else {
+                        failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());
                     }
+
+                } catch (Exception e) {
+                    failList.add(e.getMessage());
                 }
                 latch.countDown();
             });
@@ -101,7 +108,16 @@ public class CompressTask {
             latch.await();
 
             print("Already used count : " + Tinify.compressionCount());
-            print("===============finish compress===============\n");
+            print("===============finish compress===============");
+
+            if (failList.size() > 0) {
+                print("===============fail list===============");
+                for (String msg : failList) {
+                    print(msg);
+                }
+            }
+            failList.clear();
+
         } catch (Exception e) {
             print("unknown error : " + e.getMessage());
         }
@@ -116,40 +132,32 @@ public class CompressTask {
      * <p>
      * About Tinify : <a href>https://tinypng.com/</a>
      *
-     * @param srcFilePath path of image need compress
+     * @param srcFilePath  path of image need compress
      * @param destFilePath output path of image compress success
      */
-    private boolean compress(String srcFilePath, String destFilePath) {
-        String relativePath = getRelativePath(srcFilePath);
+    private void compress(String srcFilePath, String destFilePath) throws Exception {
         try {
-            print("compress : " + relativePath);
             Source source = Tinify.fromFile(srcFilePath);
             Result result = source.result();
 
-            print("download : " + relativePath);
             result.toFile(destFilePath);
-
-            return true;
         } catch (Exception e) {
-            print("Fail to compress : " + relativePath);
-
+            String filePath = getRelativePath(srcFilePath);
+            String errMsg = e.getMessage();
             if (e instanceof AccountException) {
-                print("Please verify your API key and account limit");
+                errMsg = "Please verify your API key and account limit";
 
             } else if (e instanceof ClientException) {
-                print("Please check your source image and request options");
+                errMsg = "Please check your source image and request options";
 
             } else if (e instanceof ServerException) {
-                print("Temporary issue with the Tinify API");
+                errMsg = "Temporary issue with the Tinify API";
 
             } else if (e instanceof ConnectionException) {
-                print("A network connection error occurred, please try again");
-
-            } else {
-                print("The error message is: " + e.getMessage());
+                errMsg = "A network connection error occurred, please try again";
             }
+            throw new Exception("Failed image: " + filePath + ", errorMsg: " + errMsg);
         }
-        return false;
     }
 
     /**
