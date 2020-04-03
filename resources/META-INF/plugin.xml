@@ -51,6 +51,14 @@
             <add-to-group group-id="actions_tinyimg" anchor="first" />
         </action>
 
+        <!-- 声明Action -->
+        <action id="com.ytempest.tinyimgplugin.action.ScaleImgAction" text="scaleImg"
+            class="com.ytempest.tinyimgplugin.action.ScaleImgAction"
+            description="Scale image by thumbnailator">
+            <!-- 添加Action到自定义的Group里面 -->
+            <add-to-group group-id="actions_tinyimg" anchor="last" />
+        </action>
+
         <!--**************** Menu ****************-->
 
         <!--<group id="menu_tinyimg" text="TinyImg" description="TinyImg description">
