@@ -1,4 +1,4 @@
-package com.ytempest.tinyimgplugin.tiny;
+package com.ytempest.tinyimgplugin.core;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -9,7 +9,8 @@ import com.tinify.Result;
 import com.tinify.ServerException;
 import com.tinify.Source;
 import com.tinify.Tinify;
-import com.ytempest.tinyimgplugin.TextWindowHelper;
+import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
+import com.ytempest.tinyimgplugin.util.FileUtils;
 
 import org.jetbrains.annotations.SystemIndependent;
 
@@ -121,6 +122,7 @@ public class CompressTask {
         } catch (Exception e) {
             print("unknown error : " + e.getMessage());
         }
+        print("");
     }
 
 

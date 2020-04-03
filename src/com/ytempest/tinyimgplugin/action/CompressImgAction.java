@@ -7,9 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.ytempest.tinyimgplugin.ConfigHelper;
-import com.ytempest.tinyimgplugin.TextWindowHelper;
-import com.ytempest.tinyimgplugin.Utils;
-import com.ytempest.tinyimgplugin.tiny.CompressTask;
+import com.ytempest.tinyimgplugin.core.CompressTask;
+import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
+import com.ytempest.tinyimgplugin.util.Utils;
 
 import org.apache.http.util.TextUtils;
 

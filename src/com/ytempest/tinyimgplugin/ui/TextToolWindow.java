@@ -1,4 +1,4 @@
-package com.ytempest.tinyimgplugin;
+package com.ytempest.tinyimgplugin.ui;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
@@ -6,24 +6,18 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
+import com.ytempest.tinyimgplugin.ConfigHelper;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.event.InputMethodListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.InputVerifier;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 /**
  * @author heqidu

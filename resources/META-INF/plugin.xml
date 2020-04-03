@@ -30,26 +30,38 @@
         <!-- Add your extensions here -->
         <!-- 自定义控制台输入 icon="/myToolWindow/chk_normal.png" -->
         <toolWindow canCloseContents="false" anchor="bottom" id="TinyImg"
-            factoryClass="com.ytempest.tinyimgplugin.TextToolWindowFactory" />
+            factoryClass="com.ytempest.tinyimgplugin.ui.TextToolWindowFactory" />
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
-        <action id="com.ytempest.tinyimgplugin.action.CompressImgAction"
-            class="com.ytempest.tinyimgplugin.action.CompressImgAction" text="compressImg"
-            description="Compress image by TinyPNG">
+
+        <!--**************** Task ****************-->
+
+        <!-- 声明一个Group来包裹Action -->
+        <!-- popup="true"：让Action都放到 group 的二级菜单中 -->
+        <group id="actions_tinyimg" text="tinyimg" description="TinyImg" popup="true">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
+        </group>
+
+        <!-- 声明Action -->
+        <action id="com.ytempest.tinyimgplugin.action.CompressImgAction" text="compressImg"
+            class="com.ytempest.tinyimgplugin.action.CompressImgAction"
+            description="Compress image by TinyPNG">
+            <!-- 添加Action到自定义的Group里面 -->
+            <add-to-group group-id="actions_tinyimg" anchor="first" />
         </action>
 
-        <!--<group id="menu_tinyimg" text="TinyImg" description="TinyImg description">-->
-        <!--<add-to-group group-id="MainMenu" anchor="last" />-->
-        <!--<action id="com.ytempest.tinyimgplugin.action.KeyAction"-->
-        <!--class="com.ytempest.tinyimgplugin.action.KeyAction" text="Edit Key"-->
-        <!--description="edit your key for TinyPNG" />-->
-        <!--</group>-->
+        <!--**************** Menu ****************-->
+
+        <!--<group id="menu_tinyimg" text="TinyImg" description="TinyImg description">
+            <add-to-group group-id="MainMenu" anchor="last" />
+            <action id="com.ytempest.tinyimgplugin.menu.KeyAction"
+                class="com.ytempest.tinyimgplugin.menu.KeyAction" text="Edit Key"
+                description="edit your key for TinyPNG" />
+        </group>-->
 
         <group id="menu_tinyimg" text="TinyImg" description="TinyImg description" popup="true"
-            class="com.ytempest.tinyimgplugin.action.TinyImgGroup">
+            class="com.ytempest.tinyimgplugin.menu.MenuGroup">
             <add-to-group group-id="ToolsMenu" anchor="last" />
         </group>
     </actions>
