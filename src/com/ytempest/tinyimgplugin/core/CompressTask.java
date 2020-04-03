@@ -1,7 +1,6 @@
 package com.ytempest.tinyimgplugin.core;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.tinify.AccountException;
 import com.tinify.ClientException;
 import com.tinify.ConnectionException;
@@ -9,32 +8,26 @@ import com.tinify.Result;
 import com.tinify.ServerException;
 import com.tinify.Source;
 import com.tinify.Tinify;
-import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
+import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
 
 import org.jetbrains.annotations.SystemIndependent;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author heqidu
  * @since 2020/1/22
  */
-public class CompressTask {
+public class CompressTask extends AbsTask<List<File>> {
 
-    private static final ExecutorService executor = Executors.newCachedThreadPool();
-
-    private final Project mProject;
     private final String mProjectPath;
 
     public CompressTask(Project project) {
-        mProject = project;
+        super(project);
         @SystemIndependent String basePath = project.getBasePath();
         mProjectPath = basePath != null ? basePath.replace("/", File.separator) : "";
     }
@@ -46,45 +39,29 @@ public class CompressTask {
         return this;
     }
 
-    public void exe(VirtualFile... files) {
-        if (files == null || files.length == 0) {
-            return;
+    @Override
+    protected void onExecute(List<File> files) {
+        if (DataUtils.getSize(files) >= 0) {
+            getExecutor().execute(() -> compress(files));
         }
-        executor.execute(() -> {
-            List<VirtualFile> srcFileList = new LinkedList<>();
-            for (VirtualFile virtualFile : files) {
-                if (virtualFile.isDirectory()) {
-                    List<VirtualFile> imageList = FileUtils.listImageFile(virtualFile, false);
-                    srcFileList.addAll(imageList);
-
-                } else if (FileUtils.isImageFile(virtualFile)) {
-                    srcFileList.add(virtualFile);
-                }
-            }
-            compress(srcFileList);
-        });
     }
 
     /*compress*/
 
     private final List<String> failList = new ArrayList<>();
 
-    private void compress(List<VirtualFile> inFiles) {
-        if (inFiles == null || inFiles.size() == 0) {
-            return;
-        }
-
-        print("===============start compress===============");
-        print("Use key : " + Tinify.key());
+    private void compress(List<File> inFiles) {
+        println("===============start compress===============");
+        println("Use key : " + Tinify.key());
 
         final CountDownLatch latch = new CountDownLatch(inFiles.size());
-        for (final VirtualFile srcVirtualFile : inFiles) {
-            executor.execute(() -> {
+        for (final File inFile : inFiles) {
+            getExecutor().execute(() -> {
                 // 操作临时文件
-                File srcFile = new File(srcVirtualFile.getPath());
-                File tmpFile = new File(srcVirtualFile.getParent().getPath(), srcVirtualFile.getName() + ".tmp");
+                File srcFile = new File(inFile.getPath());
+                File tmpFile = new File(inFile.getParent(), inFile.getName() + ".tmp");
                 try {
-                    print("compress : " + getRelativePath(srcFile.getPath()));
+                    println("compress : " + getRelativePath(srcFile.getPath()));
                     compress(srcFile.getPath(), tmpFile.getPath());
 
                     // 压缩成功后删除重命名临时文件为原文件
@@ -93,12 +70,13 @@ public class CompressTask {
                     long afterSize = srcFile.length();
 
                     if (success) {
-                        print(String.format("finish compress : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
+                        println(String.format("finish compress : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
                     } else {
                         failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());
                     }
 
                 } catch (Exception e) {
+                    FileUtils.delete(tmpFile);
                     failList.add(e.getMessage());
                 }
                 latch.countDown();
@@ -108,21 +86,21 @@ public class CompressTask {
         try {
             latch.await();
 
-            print("Already used count : " + Tinify.compressionCount());
-            print("===============finish compress===============");
+            println("Already used count : " + Tinify.compressionCount());
+            println("===============finish compress===============");
 
             if (failList.size() > 0) {
-                print("===============fail list===============");
+                println("===============fail list===============");
                 for (String msg : failList) {
-                    print(msg);
+                    println(msg);
                 }
             }
             failList.clear();
 
         } catch (Exception e) {
-            print("unknown error : " + e.getMessage());
+            println("unknown error : " + e.getMessage());
         }
-        print("");
+        println("");
     }
 
 
@@ -167,10 +145,5 @@ public class CompressTask {
      */
     private String getRelativePath(String path) {
         return path.replace(mProjectPath + File.separator, "");
-    }
-
-    private void print(String msg) {
-        System.out.println(msg);
-        TextWindowHelper.getInstance().print(msg, mProject);
     }
 }

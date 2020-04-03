@@ -9,9 +9,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.ytempest.tinyimgplugin.ConfigHelper;
 import com.ytempest.tinyimgplugin.core.CompressTask;
 import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
+import com.ytempest.tinyimgplugin.util.FileUtils;
 import com.ytempest.tinyimgplugin.util.Utils;
 
 import org.apache.http.util.TextUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author heqidu
@@ -45,11 +50,24 @@ public class CompressImgAction extends AnAction {
             return;
         }
 
+        // 过滤照片文件
+        List<File> srcFileList = new ArrayList<>(fileArray.length);
+        for (VirtualFile virtualFile : fileArray) {
+            File file = new File(virtualFile.getPath());
+            if (file.isDirectory()) {
+                List<File> imageList = FileUtils.listImageFile(file);
+                srcFileList.addAll(imageList);
+
+            } else if (FileUtils.isImageFile(file)) {
+                srcFileList.add(file);
+            }
+        }
+
         // 展示输出框
         TextWindowHelper.getInstance().show(project);
         // 启动压缩任务
         new CompressTask(project)
                 .key(key)
-                .exe(fileArray);
+                .exe(srcFileList);
     }
 }

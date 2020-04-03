@@ -3,6 +3,7 @@ package com.ytempest.tinyimgplugin.util;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sun.istack.internal.NotNull;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,6 +13,10 @@ import java.util.List;
  */
 public class FileUtils {
 
+    public static boolean delete(File file) {
+        return file.isFile() && file.delete();
+    }
+
     @NotNull
     public static List<VirtualFile> listImageFile(VirtualFile file) {
         return listImageFile(file, false);
@@ -20,32 +25,55 @@ public class FileUtils {
     @NotNull
     public static List<VirtualFile> listImageFile(VirtualFile file, boolean recursive) {
         List<VirtualFile> list = new LinkedList<>();
-        if (file != null && file.isDirectory()) {
+        if (file.isDirectory()) {
             VirtualFile[] files = file.getChildren();
-//            VfsUtilCore.visitChildrenRecursively();
-            int len = files != null ? files.length : 0;
-            for (int i = 0; i < len; i++) {
-                VirtualFile unknown = files[i];
-                if (recursive && unknown.isDirectory()) {
-                    list.addAll(listImageFile(unknown, recursive));
-
-                } else if (isImageFile(unknown)) {
-                    list.add(unknown);
-                }
+            for (int i = 0, len = DataUtils.getSize(files); i < len; i++) {
+                list.addAll(listImageFile(files[i], recursive));
             }
+            return list;
+        }
+
+        if (isImageFile(file)) {
+            list.addAll(listImageFile(file, recursive));
         }
         return list;
     }
 
 
-    public static boolean isImageFile(VirtualFile file) {
-        if (file.isDirectory()) {
-            return false;
+    @NotNull
+    public static List<File> listImageFile(File file) {
+        return listImageFile(file, false);
+    }
+
+    @NotNull
+    public static List<File> listImageFile(File file, boolean recursive) {
+        List<File> list = new LinkedList<>();
+        if (file.isFile()) {
+            list.add(file);
+            return list;
         }
 
-        return true;
-//        String name = file.getName();
-//        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".jpe") || name.endsWith(".jfif")
-//                || name.endsWith(".png");
+        File[] files = file.listFiles();
+        if (DataUtils.getSize(files) > 0) {
+            for (File unknown : files) {
+                list.addAll(listImageFile(unknown, recursive));
+            }
+            return list;
+        }
+        return list;
+    }
+
+
+    public static boolean isImageFile(File file) {
+        return !file.isDirectory() && isImageFile(file.getName());
+    }
+
+    public static boolean isImageFile(VirtualFile file) {
+        return !file.isDirectory() && isImageFile(file.getName());
+    }
+
+    public static boolean isImageFile(String name) {
+        return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".jpe") || name.endsWith(".jfif")
+                || name.endsWith(".png");
     }
 }
