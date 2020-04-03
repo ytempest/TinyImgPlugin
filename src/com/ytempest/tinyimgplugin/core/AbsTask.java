@@ -28,7 +28,6 @@ public abstract class AbsTask<Target> {
     }
 
     protected void println(String msg) {
-        System.out.println(msg);
         TextWindowHelper.getInstance().print(msg, mProject);
     }
 

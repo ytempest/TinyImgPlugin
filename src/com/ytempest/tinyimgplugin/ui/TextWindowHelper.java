@@ -6,6 +6,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import com.ytempest.tinyimgplugin.ConfigHelper;
+import com.ytempest.tinyimgplugin.util.TinyLog;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +20,9 @@ import javax.swing.JTextArea;
  * @since 2020/1/20
  */
 public class TextWindowHelper {
+
+    private static final String TAG = TextWindowHelper.class.getSimpleName();
+
     private volatile static TextWindowHelper sInstance = null;
 
     public static TextWindowHelper getInstance() {
@@ -43,7 +47,7 @@ public class TextWindowHelper {
             ToolWindow toolWindow = getToolWindow(project);
             if (toolWindow != null) {
                 ConfigHelper.getInstance().setWindowEnable(enable);
-                toolWindow.setAvailable(enable, () -> System.out.println(String.format("Set enable %s window : %s", WINDOW_NAME, enable)));
+                toolWindow.setAvailable(enable, () -> TinyLog.d(TAG, "setWindowEnable: " + WINDOW_NAME + " is enable: " + enable));
             }
         }
     }
@@ -52,7 +56,7 @@ public class TextWindowHelper {
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow != null) {
             setWindowEnable(true);
-            toolWindow.show(() -> System.out.println(String.format("Show %s window", WINDOW_NAME)));
+            toolWindow.show(() -> TinyLog.d(TAG, "Show window : " + WINDOW_NAME));
         }
     }
 
@@ -93,7 +97,6 @@ public class TextWindowHelper {
             }
         } catch (Exception e) {
         }
-        System.out.println("outputPanel = " + outputPanel);
         return outputPanel;
     }
 }

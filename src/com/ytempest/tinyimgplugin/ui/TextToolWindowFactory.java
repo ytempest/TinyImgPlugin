@@ -5,6 +5,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.ytempest.tinyimgplugin.util.TinyLog;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -15,9 +16,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class TextToolWindowFactory implements ToolWindowFactory {
 
+    private static final String TAG = TextToolWindowFactory.class.getSimpleName();
+
     @Override
     public void init(ToolWindow window) {
-        System.out.println("init ToolWindow : " + window);
+        TinyLog.d(TAG, "init: init ToolWindow :" + window);
     }
 
     @Override
