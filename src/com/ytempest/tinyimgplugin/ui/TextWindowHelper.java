@@ -5,6 +5,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
 import com.ytempest.tinyimgplugin.ConfigHelper;
 import com.ytempest.tinyimgplugin.util.TinyLog;
 
@@ -39,57 +40,57 @@ public class TextWindowHelper {
     private TextWindowHelper() {
     }
 
-    private static final String WINDOW_NAME = "TinyImg";
-
     public void setWindowEnable(boolean enable) {
+        ConfigHelper.getInstance().setWindowEnable(enable);
         Project[] projects = ProjectManager.getInstance().getOpenProjects();
         for (Project project : projects) {
             ToolWindow toolWindow = getToolWindow(project);
             if (toolWindow != null) {
-                ConfigHelper.getInstance().setWindowEnable(enable);
-                toolWindow.setAvailable(enable, () -> TinyLog.d(TAG, "setWindowEnable: " + WINDOW_NAME + " is enable: " + enable));
+                toolWindow.setAvailable(enable, () -> TinyLog.d(TAG, "setWindowEnable: " + TextWindow.WINDOW_NAME + " is enable: " + enable));
             }
         }
     }
 
-    public void show(Project project) {
+    public void show(Project project, @TextWindow.TabIndex int contentIndex) {
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow != null) {
             setWindowEnable(true);
-            toolWindow.show(() -> TinyLog.d(TAG, "Show window : " + WINDOW_NAME));
+            toolWindow.show(() -> {
+                ContentManager manager = toolWindow.getContentManager();
+                Content content = manager.getContent(contentIndex);
+                if (content != null) {
+                    manager.setSelectedContent(content);
+                }
+                TinyLog.d(TAG, "Show window : " + TextWindow.WINDOW_NAME);
+            });
         }
     }
 
-    public void print(String msg, Project project) {
+    public void println(Project project, @TextWindow.TabIndex int windowIndex, String msg) {
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow == null) {
             return;
         }
 
-        JTextArea outputPanel = getOutputPanel(toolWindow);
+        JTextArea outputPanel = getOutputPanel(toolWindow, windowIndex);
         if (outputPanel == null) {
             return;
         }
 
-        ToolWindowManager.getInstance(project).invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                outputPanel.append(msg + "\n");
-            }
-        });
+        ToolWindowManager.getInstance(project).invokeLater(() -> outputPanel.append(msg + "\n"));
     }
 
     @Nullable
     public ToolWindow getToolWindow(Project project) {
-        return ToolWindowManager.getInstance(project).getToolWindow(WINDOW_NAME);
+        return ToolWindowManager.getInstance(project).getToolWindow(TextWindow.WINDOW_NAME);
     }
 
     @Nullable
-    public JTextArea getOutputPanel(@NotNull ToolWindow toolWindow) {
+    private JTextArea getOutputPanel(@NotNull ToolWindow toolWindow, @TextWindow.TabIndex int windowIndex) {
         JTextArea outputPanel = null;
         try {
             // ToolWindow未初始化时
-            Content rootContent = toolWindow.getContentManager().getContent(0);
+            Content rootContent = toolWindow.getContentManager().getContent(windowIndex);
             if (rootContent != null) {
                 JPanel mainPanel = (JPanel) rootContent.getComponent().getComponent(0);
                 JScrollPane scrollPane = (JScrollPane) mainPanel.getComponent(0);

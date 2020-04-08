@@ -8,10 +8,9 @@ import com.tinify.Result;
 import com.tinify.ServerException;
 import com.tinify.Source;
 import com.tinify.Tinify;
+import com.ytempest.tinyimgplugin.ui.TextWindow;
 import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
-
-import org.jetbrains.annotations.SystemIndependent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,12 +23,8 @@ import java.util.concurrent.CountDownLatch;
  */
 public class CompressTask extends AbsTask<List<File>> {
 
-    private final String mProjectPath;
-
     public CompressTask(Project project) {
-        super(project);
-        @SystemIndependent String basePath = project.getBasePath();
-        mProjectPath = basePath != null ? basePath.replace("/", File.separator) : "";
+        super(project, TextWindow.TabIndex.COMPRESS_IMG);
     }
 
     public CompressTask key(String key) {
@@ -42,7 +37,7 @@ public class CompressTask extends AbsTask<List<File>> {
     @Override
     protected void onExecute(List<File> files) {
         if (DataUtils.getSize(files) >= 0) {
-            getExecutor().execute(() -> compress(files));
+            compress(files);
         }
     }
 
@@ -61,7 +56,7 @@ public class CompressTask extends AbsTask<List<File>> {
                 File srcFile = new File(inFile.getPath());
                 File tmpFile = new File(inFile.getParent(), inFile.getName() + ".tmp");
                 try {
-                    println("compress : " + getRelativePath(srcFile.getPath()));
+                    println("compress : " + FileUtils.getRelativePath(getProject(), srcFile.getPath()));
                     compress(srcFile.getPath(), tmpFile.getPath());
 
                     // 压缩成功后删除重命名临时文件为原文件
@@ -70,7 +65,8 @@ public class CompressTask extends AbsTask<List<File>> {
                     long afterSize = srcFile.length();
 
                     if (success) {
-                        println(String.format("finish compress : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
+                        println(String.format("finish compress : %s, size: %skb -> %skb",
+                                FileUtils.getRelativePath(getProject(), srcFile.getPath()), beforeSize, afterSize));
                     } else {
                         failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());
                     }
@@ -122,7 +118,7 @@ public class CompressTask extends AbsTask<List<File>> {
 
             result.toFile(destFilePath);
         } catch (Exception e) {
-            String filePath = getRelativePath(srcFilePath);
+            String filePath = FileUtils.getRelativePath(getProject(), srcFilePath);
             String errMsg = e.getMessage();
             if (e instanceof AccountException) {
                 errMsg = "Please verify your API key and account limit";
@@ -138,12 +134,5 @@ public class CompressTask extends AbsTask<List<File>> {
             }
             throw new Exception("Failed image: " + filePath + ", errorMsg: " + errMsg);
         }
-    }
-
-    /**
-     * 获取指定文件在当前项目的路劲
-     */
-    private String getRelativePath(String path) {
-        return path.replace(mProjectPath + File.separator, "");
     }
 }

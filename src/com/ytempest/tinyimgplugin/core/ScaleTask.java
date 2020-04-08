@@ -1,12 +1,11 @@
 package com.ytempest.tinyimgplugin.core;
 
 import com.intellij.openapi.project.Project;
+import com.ytempest.tinyimgplugin.ui.TextWindow;
 import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
 
 import net.coobird.thumbnailator.Thumbnails;
-
-import org.jetbrains.annotations.SystemIndependent;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +19,10 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ScaleTask extends AbsTask<List<File>> {
 
-    private final String mProjectPath;
     private float mScaleVal;
 
     public ScaleTask(Project project) {
-        super(project);
-        @SystemIndependent String basePath = project.getBasePath();
-        mProjectPath = basePath != null ? basePath.replace("/", File.separator) : "";
+        super(project, TextWindow.TabIndex.SCALE_IMG);
     }
 
     public ScaleTask scale(float val) {
@@ -37,7 +33,7 @@ public class ScaleTask extends AbsTask<List<File>> {
     @Override
     protected void onExecute(List<File> files) {
         if (DataUtils.getSize(files) >= 0) {
-            getExecutor().execute(() -> scale(files));
+            scale(files);
         }
     }
 
@@ -48,6 +44,7 @@ public class ScaleTask extends AbsTask<List<File>> {
     private void scale(List<File> inFiles) {
         println("===============start scale===============");
 
+        println("scale percent: " + mScaleVal);
         final CountDownLatch latch = new CountDownLatch(inFiles.size());
         for (final File inFile : inFiles) {
             getExecutor().execute(() -> {
@@ -55,7 +52,7 @@ public class ScaleTask extends AbsTask<List<File>> {
                 File srcFile = new File(inFile.getPath());
                 File tmpFile = new File(inFile.getParent(), "tmp-" + inFile.getName());
                 try {
-                    println("scale : " + getRelativePath(srcFile.getPath()));
+                    println("scale : " + FileUtils.getRelativePath(getProject(), srcFile.getPath()));
 
                     scaleImage(srcFile, tmpFile);
 
@@ -65,7 +62,8 @@ public class ScaleTask extends AbsTask<List<File>> {
                     long afterSize = srcFile.length();
 
                     if (success) {
-                        println(String.format("finish scale : %s, size: %skb -> %skb", getRelativePath(srcFile.getPath()), beforeSize, afterSize));
+                        println(String.format("finish scale : %s, size: %skb -> %skb",
+                                FileUtils.getRelativePath(getProject(), srcFile.getPath()), beforeSize, afterSize));
                     } else {
                         failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());
                     }
@@ -97,18 +95,9 @@ public class ScaleTask extends AbsTask<List<File>> {
     }
 
     private void scaleImage(File srcFile, File tmpFile) throws IOException {
-        System.out.println("mScaleVal=" + mScaleVal);
         Thumbnails.of(srcFile)
-                .scale(0.5F)
+                .scale(mScaleVal)
                 .outputQuality(1)
                 .toFile(tmpFile);
-    }
-
-
-    /**
-     * 获取指定文件在当前项目的路劲
-     */
-    private String getRelativePath(String path) {
-        return path.replace(mProjectPath + File.separator, "");
     }
 }

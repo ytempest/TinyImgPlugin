@@ -1,9 +1,11 @@
 package com.ytempest.tinyimgplugin.util;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.sun.istack.internal.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,8 +15,38 @@ import java.util.List;
  */
 public class FileUtils {
 
+    /**
+     * 获取路径相对于工程目录的路径
+     */
+    public static String getRelativePath(Project project, String path) {
+        String basePath = project.getBasePath();
+        if (basePath == null) {
+            return path;
+        }
+        String projectPath = basePath.replace("/", File.separator);
+        return path.replace(projectPath + File.separator, "");
+    }
+
     public static boolean delete(File file) {
         return file.isFile() && file.delete();
+    }
+
+    /**
+     * 获取文件列表下所有一级目录的图片
+     */
+    public static List<File> getImageList(@NotNull VirtualFile[] fileArray) {
+        // 过滤照片文件
+        List<File> srcFileList = new ArrayList<>();
+        for (VirtualFile virtualFile : fileArray) {
+            File file = new File(virtualFile.getPath());
+            if (file.isDirectory()) {
+                srcFileList.addAll(listImageFile(file));
+
+            } else if (isImageFile(file)) {
+                srcFileList.add(file);
+            }
+        }
+        return srcFileList;
     }
 
     @NotNull

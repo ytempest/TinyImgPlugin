@@ -1,6 +1,7 @@
 package com.ytempest.tinyimgplugin.core;
 
 import com.intellij.openapi.project.Project;
+import com.ytempest.tinyimgplugin.ui.TextWindow;
 import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
 
 import java.util.concurrent.ExecutorService;
@@ -18,9 +19,11 @@ public abstract class AbsTask<Target> {
     }
 
     private final Project mProject;
+    private final int windowIndex;
 
-    public AbsTask(Project project) {
-        mProject = project;
+    public AbsTask(Project project, @TextWindow.TabIndex int windowIndex) {
+        this.mProject = project;
+        this.windowIndex = windowIndex;
     }
 
     protected Project getProject() {
@@ -28,7 +31,7 @@ public abstract class AbsTask<Target> {
     }
 
     protected void println(String msg) {
-        TextWindowHelper.getInstance().print(msg, mProject);
+        TextWindowHelper.getInstance().println(mProject, windowIndex, msg);
     }
 
     public void exe(Target target) {

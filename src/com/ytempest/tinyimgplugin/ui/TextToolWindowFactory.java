@@ -25,9 +25,14 @@ public class TextToolWindowFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        TextToolWindow textToolWindow = new TextToolWindow(toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        Content content = contentFactory.createContent(textToolWindow.getContent(), "", false);
-        toolWindow.getContentManager().addContent(content);
+
+        TextToolWindow compressWindow = new TextToolWindow(toolWindow);
+        Content compressContent = contentFactory.createContent(compressWindow.getContent(), TextWindow.TabName.COMPRESS_IMG, false);
+        toolWindow.getContentManager().addContent(compressContent, TextWindow.TabIndex.COMPRESS_IMG);
+
+        TextToolWindow scaleWindow = new TextToolWindow(toolWindow);
+        Content scaleContent = contentFactory.createContent(scaleWindow.getContent(), TextWindow.TabName.SCALE_IMG, false);
+        toolWindow.getContentManager().addContent(scaleContent, TextWindow.TabIndex.SCALE_IMG);
     }
 }
