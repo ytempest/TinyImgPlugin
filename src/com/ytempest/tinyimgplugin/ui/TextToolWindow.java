@@ -1,8 +1,10 @@
 package com.ytempest.tinyimgplugin.ui;
 
+import com.intellij.ide.ui.laf.darcula.ui.DarculaTextAreaUI;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.PopupChooserBuilder;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.Gray;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
@@ -25,25 +27,22 @@ import javax.swing.JTextArea;
  */
 public class TextToolWindow {
 
-    private ToolWindow mToolWindow;
     private JPanel mRootPanel;
     private JScrollPane mScrollPane;
     private JTextArea mTextArea;
 
     public TextToolWindow(ToolWindow toolWindow) {
-        mToolWindow = toolWindow;
-
         boolean enable = ConfigHelper.getInstance().isWindowEnable();
-        mToolWindow.setAvailable(enable, null);
+        toolWindow.setAvailable(enable, null);
 
-        init();
-    }
+        updateTextAreaBg();
+        mTextArea.addPropertyChangeListener(evt -> {
+            // 当更改IDEA主题时，属性名为UI的属性会发生变化
+            if ("UI".equals(evt.getPropertyName())) {
+                updateTextAreaBg();
+            }
+        });
 
-    public JPanel getContent() {
-        return mRootPanel;
-    }
-
-    private void init() {
         mTextArea.setEditable(false);
         mTextArea.setMargin(JBUI.insets(5, 13, 5, 13));
         // 去除边框
@@ -86,6 +85,23 @@ public class TextToolWindow {
 //                mTextArea.getCaret().setVisible(true);   //使Text区的文本光标显示
 //            }
 //        });
+    }
+
+    public JPanel getContent() {
+        return mRootPanel;
+    }
+
+    /**
+     * 根据不同的IDEA主题更换JTextArea的背景色
+     */
+    private void updateTextAreaBg() {
+        // 判断是否为Darcula主题
+        boolean isDarcula = mTextArea.getUI() instanceof DarculaTextAreaUI;
+        if (isDarcula) {
+            mTextArea.setBackground(Gray._43);
+        } else {
+            mTextArea.setBackground(Gray._255);
+        }
     }
 
     private static final String CLEAR_ALL = "    Clear All        ";
