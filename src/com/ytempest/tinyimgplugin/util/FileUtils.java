@@ -50,29 +50,6 @@ public class FileUtils {
     }
 
     @NotNull
-    public static List<VirtualFile> listImageFile(VirtualFile file) {
-        return listImageFile(file, false);
-    }
-
-    @NotNull
-    public static List<VirtualFile> listImageFile(VirtualFile file, boolean recursive) {
-        List<VirtualFile> list = new LinkedList<>();
-        if (file.isDirectory()) {
-            VirtualFile[] files = file.getChildren();
-            for (int i = 0, len = DataUtils.getSize(files); i < len; i++) {
-                list.addAll(listImageFile(files[i], recursive));
-            }
-            return list;
-        }
-
-        if (isImageFile(file)) {
-            list.addAll(listImageFile(file, recursive));
-        }
-        return list;
-    }
-
-
-    @NotNull
     public static List<File> listImageFile(File file) {
         return listImageFile(file, false);
     }
@@ -80,7 +57,7 @@ public class FileUtils {
     @NotNull
     public static List<File> listImageFile(File file, boolean recursive) {
         List<File> list = new LinkedList<>();
-        if (file.isFile()) {
+        if (file.isFile() && isImageFile(file)) {
             list.add(file);
             return list;
         }
@@ -97,10 +74,6 @@ public class FileUtils {
 
 
     public static boolean isImageFile(File file) {
-        return !file.isDirectory() && isImageFile(file.getName());
-    }
-
-    public static boolean isImageFile(VirtualFile file) {
         return !file.isDirectory() && isImageFile(file.getName());
     }
 
