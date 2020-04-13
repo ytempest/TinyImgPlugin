@@ -81,4 +81,24 @@ public class FileUtils {
         return name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".jpe") || name.endsWith(".jfif")
                 || name.endsWith(".png");
     }
+
+
+    public static String convertSize(long size) {
+        if (size < 1024L) {
+            return String.valueOf(size) + "b";
+        }
+
+        size = size / 1024L;
+        if (size < 1024L) {
+            return size + "kb";
+        }
+
+        float sizeMB = size / 1024F;
+        if (sizeMB < 1024F) {
+            return String.format("%.2fM", sizeMB);
+        }
+
+        float sizeGB = sizeMB / 1024F;
+        return String.format("%.2fG", sizeGB);
+    }
 }

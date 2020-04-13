@@ -13,7 +13,7 @@ import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -43,7 +43,7 @@ public class CompressTask extends AbsTask<List<File>> {
 
     /*compress*/
 
-    private final List<String> failList = new ArrayList<>();
+    private final List<String> failList = new LinkedList<>();
 
     private void compress(List<File> inFiles) {
         println("===============start compress===============");
@@ -60,12 +60,12 @@ public class CompressTask extends AbsTask<List<File>> {
                     compress(srcFile.getPath(), tmpFile.getPath());
 
                     // 压缩成功后删除重命名临时文件为原文件
-                    long beforeSize = srcFile.length();
+                    String beforeSize = FileUtils.convertSize(srcFile.length());
                     boolean success = srcFile.delete() && tmpFile.renameTo(srcFile);
-                    long afterSize = srcFile.length();
+                    String afterSize = FileUtils.convertSize(srcFile.length());
 
                     if (success) {
-                        println(String.format("finish compress : %s, size: %skb -> %skb",
+                        println(String.format("finish compress : %s, size: %s -> %s",
                                 FileUtils.getRelativePath(getProject(), srcFile.getPath()), beforeSize, afterSize));
                     } else {
                         failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());

@@ -1,15 +1,17 @@
 package com.ytempest.tinyimgplugin.core;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Pair;
 import com.ytempest.tinyimgplugin.ui.TextWindow;
 import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
 
 import net.coobird.thumbnailator.Thumbnails;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -39,7 +41,7 @@ public class ScaleTask extends AbsTask<List<File>> {
 
     /*scale*/
 
-    private final List<String> failList = new ArrayList<>();
+    private final List<String> failList = new LinkedList<>();
 
     private void scale(List<File> inFiles) {
         println("===============start scale===============");
@@ -57,13 +59,14 @@ public class ScaleTask extends AbsTask<List<File>> {
                     scaleImage(srcFile, tmpFile);
 
                     // 压缩成功后删除重命名临时文件为原文件
-                    long beforeSize = srcFile.length();
+                    Pair<String, String> srcImg = getImageInfo(srcFile);
                     boolean success = srcFile.delete() && tmpFile.renameTo(srcFile);
-                    long afterSize = srcFile.length();
+                    Pair<String, String> destImg = getImageInfo(srcFile);
 
                     if (success) {
-                        println(String.format("finish scale : %s, size: %skb -> %skb",
-                                FileUtils.getRelativePath(getProject(), srcFile.getPath()), beforeSize, afterSize));
+                        println(String.format("finish scale : %s, resolution: %s -> %s, size: %s -> %s",
+                                FileUtils.getRelativePath(getProject(), srcFile.getPath()),
+                                srcImg.first, destImg.first, srcImg.second, destImg.second));
                     } else {
                         failList.add("Fail to process the file : " + tmpFile.getAbsolutePath());
                     }
@@ -92,6 +95,13 @@ public class ScaleTask extends AbsTask<List<File>> {
             println("unknown error : " + e.getMessage());
         }
         println("");
+    }
+
+    private Pair<String, String> getImageInfo(File image) throws IOException {
+        BufferedImage srcImg = Thumbnails.of(image).scale(1).asBufferedImage();
+        String resolution = srcImg.getWidth() + "x" + srcImg.getHeight();
+        String size = FileUtils.convertSize(image.length());
+        return new Pair<>(resolution, size);
     }
 
     private void scaleImage(File srcFile, File tmpFile) throws IOException {

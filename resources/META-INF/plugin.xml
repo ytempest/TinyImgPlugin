@@ -41,6 +41,7 @@
         <!-- popup="true"：让Action都放到 group 的二级菜单中 -->
         <group id="actions_tinyimg" text="tinyimg" description="TinyImg" popup="true">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last" />
+            <add-to-group group-id="Images.EditorPopupMenu" anchor="last" />
         </group>
 
         <!-- 声明Action -->
