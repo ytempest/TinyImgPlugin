@@ -55,6 +55,10 @@ public class TextWindowHelper {
         ToolWindow toolWindow = getToolWindow(project);
         if (toolWindow != null) {
             setWindowEnable(true);
+            // 激活窗口
+            if (!toolWindow.isActive()) {
+                toolWindow.activate(() -> TinyLog.d(TAG, "show: "));
+            }
             toolWindow.show(() -> {
                 ContentManager manager = toolWindow.getContentManager();
                 Content content = manager.getContent(contentIndex);
