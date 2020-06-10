@@ -2,9 +2,14 @@ package com.ytempest.tinyimgplugin.util;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.sun.glass.ui.Size;
 import com.sun.istack.internal.NotNull;
 
+import net.coobird.thumbnailator.Thumbnails;
+
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,7 +68,7 @@ public class FileUtils {
         }
 
         File[] files = file.listFiles();
-        if (DataUtils.getSize(files) > 0) {
+        if (!DataUtils.isEmpty(files)) {
             for (File unknown : files) {
                 list.addAll(listImageFile(unknown, recursive));
             }
@@ -100,5 +105,16 @@ public class FileUtils {
 
         float sizeGB = sizeMB / 1024F;
         return String.format("%.2fG", sizeGB);
+    }
+
+    public static Size getImageSize(File image) {
+        try {
+            if (image != null) {
+                BufferedImage srcImg = Thumbnails.of(image).scale(1).asBufferedImage();
+                return new Size(srcImg.getWidth(), srcImg.getHeight());
+            }
+        } catch (IOException e) {
+        }
+        return new Size(0, 0);
     }
 }

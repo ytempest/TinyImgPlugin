@@ -14,6 +14,12 @@
             <li>Support edit API_KEY orf TinyPNG</li>
             <li>Support target a image or directory</li>
         </ul>
+
+        <b>2.0</b>
+        <ul>
+            <li>fix some bug</li>
+            <li>Support scale image</li>
+        </ul>
     ]]>
     </change-notes>
 

@@ -36,7 +36,7 @@ public class CompressTask extends AbsTask<List<File>> {
 
     @Override
     protected void onExecute(List<File> files) {
-        if (DataUtils.getSize(files) >= 0) {
+        if (!DataUtils.isEmpty(files)) {
             compress(files);
         }
     }

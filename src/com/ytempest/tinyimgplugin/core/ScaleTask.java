@@ -34,7 +34,7 @@ public class ScaleTask extends AbsTask<List<File>> {
 
     @Override
     protected void onExecute(List<File> files) {
-        if (DataUtils.getSize(files) >= 0) {
+        if (!DataUtils.isEmpty(files)) {
             scale(files);
         }
     }
