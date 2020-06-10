@@ -10,11 +10,11 @@ import java.util.List;
 public class DataUtils {
 
     public static boolean isEmpty(Collection<?> collection) {
-        return collection != null && collection.size() == 0;
+        return collection == null || collection.size() == 0;
     }
 
     public static boolean isEmpty(Object[] array) {
-        return array != null && array.length == 0;
+        return array == null || array.length == 0;
     }
 
     public static int getSize(Collection<?> collection) {
