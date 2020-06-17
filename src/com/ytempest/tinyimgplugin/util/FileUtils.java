@@ -2,7 +2,6 @@ package com.ytempest.tinyimgplugin.util;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sun.glass.ui.Size;
 import com.sun.istack.internal.NotNull;
 
 import net.coobird.thumbnailator.Thumbnails;

@@ -6,13 +6,13 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.sun.glass.ui.Size;
 import com.ytempest.tinyimgplugin.core.ScaleTask;
 import com.ytempest.tinyimgplugin.ui.PercentDialog;
 import com.ytempest.tinyimgplugin.ui.TextWindow;
 import com.ytempest.tinyimgplugin.ui.TextWindowHelper;
 import com.ytempest.tinyimgplugin.util.DataUtils;
 import com.ytempest.tinyimgplugin.util.FileUtils;
+import com.ytempest.tinyimgplugin.util.Size;
 
 import java.io.File;
 import java.util.List;

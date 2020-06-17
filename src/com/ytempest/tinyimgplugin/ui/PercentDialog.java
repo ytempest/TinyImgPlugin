@@ -1,6 +1,7 @@
 package com.ytempest.tinyimgplugin.ui;
 
-import com.sun.glass.ui.Size;
+
+import com.ytempest.tinyimgplugin.util.Size;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
